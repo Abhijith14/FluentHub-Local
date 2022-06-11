@@ -1,0 +1,60 @@
+﻿<Page
+    x:Class="FluentHub.Views.Home.ActivitiesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:block="using:FluentHub.UserControls.Blocks"
+    xmlns:bvm="using:FluentHub.ViewModels.UserControls.Blocks"
+    xmlns:converters="using:FluentHub.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:toolkit="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    mc:Ignorable="d">
+
+    <Grid>
+
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            <muxc:ItemsRepeater Margin="18,4,18,18" ItemsSource="{x:Bind ViewModel.Activities}">
+
+                <DataTemplate x:DataType="bvm:ActivityBlockViewModel">
+                    <block:ActivityBlock ViewModel="{x:Bind}" />
+                </DataTemplate>
+
+            </muxc:ItemsRepeater>
+        </ScrollViewer>
+
+        <toolkit:SwitchPresenter
+            Grid.RowSpan="3"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            TargetType="x:Boolean"
+            Value="{x:Bind ViewModel.RefreshActivitiesCommand.IsRunning, Mode=OneWay}">
+
+            <toolkit:Case Value="True">
+                <muxc:ProgressRing IsActive="True" />
+            </toolkit:Case>
+
+            <toolkit:Case Value="False">
+                <toolkit:SwitchPresenter TargetType="x:Boolean" Value="{x:Bind ViewModel.RefreshActivitiesCommand.ExecutionTask.IsFaulted, Mode=OneWay}">
+                    <toolkit:Case Value="True">
+                        <HyperlinkButton Command="{x:Bind ViewModel.RefreshActivitiesCommand}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon FontSize="16" Glyph="&#xE149;" />
+                                <TextBlock Text="Refresh" />
+                            </StackPanel>
+                        </HyperlinkButton>
+                    </toolkit:Case>
+
+                    <toolkit:Case Value="False">
+                        <toolkit:SwitchPresenter TargetType="x:Int32" Value="{x:Bind ViewModel.Activities.Count, Mode=OneWay}">
+                            <toolkit:Case Value="0">
+                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="No items available" />
+                            </toolkit:Case>
+                        </toolkit:SwitchPresenter>
+                    </toolkit:Case>
+                </toolkit:SwitchPresenter>
+            </toolkit:Case>
+
+        </toolkit:SwitchPresenter>
+    </Grid>
+</Page>
